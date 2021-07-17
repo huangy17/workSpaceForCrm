@@ -141,4 +141,17 @@ public class ActivityServiceImpl implements ActivityService {
 
         return flag ;
     }
+
+    @Override
+    public boolean saveRemark(ActivityRemark map) {
+        boolean flag = true;
+
+        int count = activityRemarkDao.saveRemark(map);
+
+        if(count!=1){
+            return false;
+        }
+
+        return flag;
+    }
 }
