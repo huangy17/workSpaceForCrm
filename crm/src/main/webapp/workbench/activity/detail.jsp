@@ -84,7 +84,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 						//在textarea文本域上方新增一个div
 						var html=""
 
-						html +=   '<div ‘+ data.ar.id +’class="remarkDiv" style="height: 60px;">';
+						html +=   '<div id="‘+ data.ar.id +’" class="remarkDiv" style="height: 60px;">';
 						html +=   '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 						html +=   '<div style="position: relative; top: -40px; left: 40px;" >';
 						html +=   '<h5>'+data.ar.noteContent+'</h5>';
@@ -129,7 +129,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 
 				$.each(data,function(i,n){
 
-					html +=   '<div ‘+ n.id +’class="remarkDiv" style="height: 60px;">';
+					html +=   '<div id="‘+ n.id +’" class="remarkDiv" style="height: 60px;">';
 					html +=   '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 					html +=   '<div style="position: relative; top: -40px; left: 40px;" >';
 					html +=   '<h5>'+n.noteContent+'</h5>';
