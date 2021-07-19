@@ -52,9 +52,42 @@ public class ActivityController extends HttpServlet {
             deleteRemark(request,response);
         }else if("/workbench/activity/saveRemark.do".equals(servletPath)){
             saveRemark(request,response);
+        }else if("/workbench/activity/updateRemark.do".equals(servletPath)){
+            updateRemark(request,response);
+        }else if("/workbench/activity/xxx.do".equals(servletPath)){
+            //xxx(request,response);
+        }else if("/workbench/activity/xxx.do".equals(servletPath)){
+            //xxx(request,response);
         }else if("/workbench/activity/xxx.do".equals(servletPath)){
             //xxx(request,response);
         }
+    }
+
+    private void updateRemark(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入修改加备注操作");
+
+        String noteContent = request.getParameter("noteContent");
+        String id = request.getParameter("id");
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
+        String editTime = DateTimeUtil.getSysTime();
+        String editFlag = "1";
+
+        ActivityRemark ar = new ActivityRemark();
+        ar.setId(id);
+        ar.setNoteContent(noteContent);
+        ar.setEditTime(editTime);
+        ar.setEditBy(editBy);
+        ar.setEditFlag(editFlag);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+
+        boolean flag = as.updateRemark(ar);
+
+        Map<String,Object> map =new HashMap<String,Object>();
+        map.put("success",flag);
+        map.put("ar",ar);
+
+        PrintJson.printJsonObj(response,map);
     }
 
     private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
