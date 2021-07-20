@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
 String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
 %>
@@ -20,7 +21,59 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 
 	$(function(){
 		
-		
+		//为创建按钮绑定事件，打开添加操作的模态窗口
+		$("#addBtn").click(function () {
+			$.ajax({
+
+				url : "workbench/clue/getUserList.do",
+				type : "get",
+				dataType : "json",
+				success : function (data) {
+
+					/*
+
+                        data
+                            [{"id":?,"name":?,"loginAct":?.......},{2},{3}...]
+
+                     */
+
+					var html = "<option></option>";
+
+					//遍历出来的每一个n，就是每一个user对象
+					$.each(data,function (i,n) {
+
+						html += "<option value='"+n.id+"'>"+n.name+"</option>";
+
+					})
+
+					$("#create-owner").html(html);
+
+
+					//将当前登录的用户，设置为下拉框默认的选项
+					/*
+
+                        <select id="create-owner">
+                            <option value="40f6cdea0bd34aceb77492a1656d9fb3">张三</option>
+                            <option value="06f5fc056eac41558a964f96daa7f27c">李四</option>
+                        </select>
+
+                        $("#create-owner").val("40f6cdea0bd34aceb77492a1656d9fb3");
+
+
+                     */
+
+					//取得当前登录用户的id
+					//在js中使用el表达式，el表达式一定要套用在字符串中
+					var id = "${user.id}";
+
+					$("#create-owner").val(id);
+					//所有者下拉框处理完毕后，展现模态窗口
+					$("#createClueModal").modal("show");
+
+				}
+
+			})
+		})
 		
 	});
 	
@@ -44,10 +97,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 						<div class="form-group">
 							<label for="create-clueOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="create-clueOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+								<select class="form-control" id="create-owner">
+
+
 								</select>
 							</div>
 							<label for="create-company" class="col-sm-2 control-label">公司<span style="font-size: 15px; color: red;">*</span></label>
@@ -61,11 +113,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-call">
 								  <option></option>
-								  <option>先生</option>
-								  <option>夫人</option>
-								  <option>女士</option>
-								  <option>博士</option>
-								  <option>教授</option>
+ 								  <c:forEach items="${appellationList}" var="a">
+									  <option value="${a.value}">${a.text}</option>
+								  </c:forEach>
 								</select>
 							</div>
 							<label for="create-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
@@ -105,13 +155,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-status">
 								  <option></option>
-								  <option>试图联系</option>
-								  <option>将来联系</option>
-								  <option>已联系</option>
-								  <option>虚假线索</option>
-								  <option>丢失线索</option>
-								  <option>未联系</option>
-								  <option>需要条件</option>
+									<c:forEach items="${clueStateList}" var="c">
+										<option value="${c.value}">${c.text}</option>
+									</c:forEach>
 								</select>
 							</div>
 						</div>
@@ -121,20 +167,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-source">
 								  <option></option>
-								  <option>广告</option>
-								  <option>推销电话</option>
-								  <option>员工介绍</option>
-								  <option>外部介绍</option>
-								  <option>在线商场</option>
-								  <option>合作伙伴</option>
-								  <option>公开媒介</option>
-								  <option>销售邮件</option>
-								  <option>合作伙伴研讨会</option>
-								  <option>内部研讨会</option>
-								  <option>交易会</option>
-								  <option>web下载</option>
-								  <option>web调研</option>
-								  <option>聊天</option>
+									<c:forEach items="${sourceList}" var="s">
+										<option value="${s.value}">${s.text}</option>
+									</c:forEach>
 								</select>
 							</div>
 						</div>
@@ -443,7 +478,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 40px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
-				  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createClueModal"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+				  <button type="button" class="btn btn-primary" id="addBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editClueModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
