@@ -40,6 +40,10 @@
 
 
 
+  <listener>
+    <listener-class>com.bjpowernode.crm.web.listener.SysInitListener</listener-class>
+  </listener>
+
 
 
   <!--用户控制器-->
