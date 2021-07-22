@@ -44,15 +44,42 @@ public class ClueController extends HttpServlet {
             save(request,response);
         }else if("/workbench/clue/detail.do".equals(servletPath)){
             detail(request,response);
-        }else if("/workbench/clue/xxx.do".equals(servletPath)){
-            //xxx(request,response);
-        }else if("/workbench/clue/xxx.do".equals(servletPath)){
-            //xxx(request,response);
+        }else if("/workbench/clue/getActivityListByClueId.do".equals(servletPath)){
+            getActivityListByClueId(request,response);
+        }else if("/workbench/clue/unbund.do".equals(servletPath)){
+            unbund(request,response);
         }else if("/workbench/clue/xxx.do".equals(servletPath)){
             //xxx(request,response);
         }else if("/workbench/clue/xxx.do".equals(servletPath)){
             //xxx(request,response);
         }
+    }
+
+    private void unbund(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("执行解除关联操作");
+        String id = request.getParameter("id");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        boolean flag = cs.unbund(id);
+
+        PrintJson.printJsonFlag(response,flag);
+
+    }
+
+    private void getActivityListByClueId(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("根据线索id获取市场活动列表");
+
+        String id = request.getParameter("clueId");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        List<Activity> aList = cs.getActivityListById(id);
+
+        PrintJson.printJsonObj(response, aList);
+
     }
 
     private void detail(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {

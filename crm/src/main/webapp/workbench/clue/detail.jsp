@@ -51,7 +51,77 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		$(".myHref").mouseout(function(){
 			$(this).children("span").css("color","#E6E6E6");
 		});
+
+		showActivityList();
+
 	});
+
+	function unbund(id){
+		$.ajax({
+
+			url : "workbench/clue/unbund.do",
+			data : {
+				"id" : id
+			},
+			type : "post",
+			dataType : "json",
+			success : function (data) {
+				//alert("detail!")
+				/*
+                    data
+                        {"dataList":[{市场活动1},{2},{3}]}
+                 */
+
+				if(data.success){
+
+					//解除关联成功
+					//刷新关联的市场活动列表
+					showActivityList();
+
+				}else{
+
+					alert("解除关联失败");
+
+				}
+			}
+		})
+
+	};
+
+	function showActivityList() {
+		$.ajax({
+
+			url : "workbench/clue/getActivityListByClueId.do",
+			data : {
+				"clueId" : "${requestScope.c.id}"
+			},
+			type : "get",
+			dataType : "json",
+			success : function (data) {
+				//alert("detail!")
+				/*
+                    data
+                        {"dataList":[{市场活动1},{2},{3}]}
+                 */
+
+				var html = "";
+
+				//每一个n就是每一个市场活动对象
+				$.each(data,function (i,n) {
+
+					html += '<tr>'
+					html += '<td>'+n.name+'</td>';
+					html += '<td>'+n.startDate+'</td>';
+					html += '<td>'+n.endDate+'</td>';
+					html += '<td>'+n.owner+'</td>';
+					html += '<td><a href="javascript:void(0);" onclick="unbund(\''+n.id+'\')" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>';
+					html += '</tr>';
+				})
+				$("#activityBody").html(html);
+			}
+		})
+
+	};
 
 </script>
 
@@ -435,8 +505,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="activityBody">
+						<%--<tr>
 							<td>发传单</td>
 							<td>2020-10-10</td>
 							<td>2020-10-20</td>
@@ -449,7 +519,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 							<td>2020-10-20</td>
 							<td>zhangsan</td>
 							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-						</tr>
+						</tr>--%>
 					</tbody>
 				</table>
 			</div>
