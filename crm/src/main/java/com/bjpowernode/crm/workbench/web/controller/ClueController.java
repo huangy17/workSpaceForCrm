@@ -48,11 +48,47 @@ public class ClueController extends HttpServlet {
             getActivityListByClueId(request,response);
         }else if("/workbench/clue/unbund.do".equals(servletPath)){
             unbund(request,response);
+        }else if("/workbench/clue/getActivityListByNameAndExcludeClueId.do".equals(servletPath)){
+            getActivityListByNameAndExcludeClueId(request,response);
+        }else if("/workbench/clue/bund.do".equals(servletPath)){
+            bund(request,response);
+        }else if("/workbench/clue/xxx.do".equals(servletPath)){
+            //xxx(request,response);
+        }else if("/workbench/clue/xxx.do".equals(servletPath)){
+            //xxx(request,response);
         }else if("/workbench/clue/xxx.do".equals(servletPath)){
             //xxx(request,response);
         }else if("/workbench/clue/xxx.do".equals(servletPath)){
             //xxx(request,response);
         }
+    }
+
+    private void bund(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("执行关联市场活动的操作");
+
+        String cid=request.getParameter("cid");
+        String[] aids = request.getParameterValues("aid");
+
+        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+        boolean flag = cs.bund(cid,aids);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    private void getActivityListByNameAndExcludeClueId(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("查询市场活动列表（更具名称模糊查询+排除掉已经关联指定线索的列表）");
+        String aname = request.getParameter("aname");
+        String clueId = request.getParameter("clueId");
+
+        Map<String,String> map = new HashMap<>();
+        map.put("aname",aname);
+        map.put("clueId",clueId);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        List<Activity> aList = as.getActivityListByNameAndExcludeClueId(map);
+
+        PrintJson.printJsonObj(response,aList);
     }
 
     private void unbund(HttpServletRequest request, HttpServletResponse response) {
@@ -74,9 +110,10 @@ public class ClueController extends HttpServlet {
 
         String id = request.getParameter("clueId");
 
-        ClueService cs = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+        ActivityService cs = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
 
         List<Activity> aList = cs.getActivityListById(id);
+
 
         PrintJson.printJsonObj(response, aList);
 

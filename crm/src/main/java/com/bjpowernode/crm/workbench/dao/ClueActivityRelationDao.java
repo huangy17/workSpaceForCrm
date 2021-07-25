@@ -8,7 +8,9 @@ import java.util.List;
 public interface ClueActivityRelationDao {
 
 
-    List<Activity> getActivityListByClueId(String clueId);
+
 
     int unbund(String id);
+
+    int bund(ClueActivityRelation car);
 }

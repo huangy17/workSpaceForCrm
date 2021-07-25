@@ -6,6 +6,7 @@ import com.bjpowernode.crm.utils.SqlSessionUtil;
 import com.bjpowernode.crm.vo.PaginationVO;
 import com.bjpowernode.crm.workbench.dao.ActivityDao;
 import com.bjpowernode.crm.workbench.dao.ActivityRemarkDao;
+import com.bjpowernode.crm.workbench.dao.ClueActivityRelationDao;
 import com.bjpowernode.crm.workbench.domain.Activity;
 import com.bjpowernode.crm.workbench.domain.ActivityRemark;
 import com.bjpowernode.crm.workbench.service.ActivityService;
@@ -23,6 +24,7 @@ public class ActivityServiceImpl implements ActivityService {
     private ActivityDao activityDao = SqlSessionUtil.getSqlSession().getMapper(ActivityDao.class);
     private ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
     private UserDao userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
+    private ClueActivityRelationDao clueActivityRelationDao = SqlSessionUtil.getSqlSession().getMapper(ClueActivityRelationDao.class);
 
 
     @Override
@@ -167,5 +169,25 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         return flag;
+    }
+
+
+    @Override
+    public List<Activity> getActivityListById(String clueId) {
+
+
+
+        List<Activity> list = activityDao.getActivityListByClueId(clueId);
+
+        System.out.println(list.get(0));
+        return list;
+    }
+
+    @Override
+    public List<Activity> getActivityListByNameAndExcludeClueId(Map<String, String> map) {
+
+        List<Activity> aList = activityDao.getActivityListByNameAndExcludeClueId(map);
+
+        return aList;
     }
 }

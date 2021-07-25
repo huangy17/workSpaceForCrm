@@ -1,11 +1,14 @@
 package com.bjpowernode.crm.workbench.service.impl;
 
 import com.bjpowernode.crm.utils.SqlSessionUtil;
+import com.bjpowernode.crm.utils.UUIDUtil;
 import com.bjpowernode.crm.workbench.dao.ClueActivityRelationDao;
 import com.bjpowernode.crm.workbench.dao.ClueDao;
 import com.bjpowernode.crm.workbench.domain.Activity;
 import com.bjpowernode.crm.workbench.domain.Clue;
+import com.bjpowernode.crm.workbench.domain.ClueActivityRelation;
 import com.bjpowernode.crm.workbench.service.ClueService;
+import sun.plugin.util.UIUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,15 +43,6 @@ public class ClueServiceImpl implements ClueService {
         return c;
     }
 
-    @Override
-    public List<Activity> getActivityListById(String clueId) {
-
-
-
-        List<Activity> list = clueActivityRelationDao.getActivityListByClueId(clueId);
-
-        return list;
-    }
 
     @Override
     public boolean unbund(String id) {
@@ -66,5 +60,20 @@ public class ClueServiceImpl implements ClueService {
         return flag;
 
 
+    }
+
+    @Override
+    public boolean bund(String cid, String[] aids) {
+        for(String aid : aids) {
+            ClueActivityRelation car = new ClueActivityRelation();
+            car.setId(UUIDUtil.getUUID());
+            car.setActivityId(aid);
+            car.setClueId(cid);
+            System.out.println(car.toString());
+            if (clueActivityRelationDao.bund(car) != 1) {
+                return false;
+            }
+        }
+        return true;
     }
 }

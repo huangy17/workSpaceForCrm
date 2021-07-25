@@ -14,7 +14,9 @@ public interface ClueService {
 
     Clue detail(String id);
 
-    List<Activity> getActivityListById(String id);
+
 
     boolean unbund(String id);
+
+    boolean bund(String cid, String[] aids);
 }
