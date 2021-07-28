@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import org.apache.ibatis.session.SqlSession;
-
+//用来管理事务的，可能可以使用@Transaction注解代替
 public class TransactionInvocationHandler implements InvocationHandler{
 	
 	private Object target;

@@ -35,4 +35,6 @@ public interface ActivityService {
     List<Activity> getActivityListById(String id);
 
     List<Activity> getActivityListByNameAndExcludeClueId(Map<String, String> map);
+
+    List<Activity> getActivityListByName(String aname);
 }

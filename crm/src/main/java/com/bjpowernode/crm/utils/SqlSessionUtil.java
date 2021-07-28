@@ -7,7 +7,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-
+//用来创建sqlsession对象的，使用spring-mybatis整合框架实现。
 public class SqlSessionUtil {
 	
 	private SqlSessionUtil(){}
