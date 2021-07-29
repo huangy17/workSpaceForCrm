@@ -190,6 +190,102 @@ public class ClueServiceImpl implements ClueService {
             }
 
         }
+        //(5) “线索和市场活动”的关系转换到“联系人和市场活动”的关系
+        //查询出与该条线索关联的市场活动，查询与市场活动的关联关系列表
+        List<ClueActivityRelation> clueActivityRelationList = clueActivityRelationDao.getListByClueId(clueId);
+        //遍历出每一条与市场活动关联的关联关系记录
+        for(ClueActivityRelation clueActivityRelation : clueActivityRelationList){
+
+            //从每一条遍历出来的记录中取出关联的市场活动id
+            String activityId = clueActivityRelation.getActivityId();
+
+            //创建 联系人与市场活动的关联关系对象 让第三步生成的联系人与市场活动做关联
+            ContactsActivityRelation contactsActivityRelation = new ContactsActivityRelation();
+            contactsActivityRelation.setId(UUIDUtil.getUUID());
+            contactsActivityRelation.setActivityId(activityId);
+            contactsActivityRelation.setContactsId(con.getId());
+            //添加联系人与市场活动的关联关系
+            int count5 = contactsActivityRelationDao.save(contactsActivityRelation);
+            if(count5!=1){
+                flag = false;
+            }
+
+
+        }
+
+        //(6)如果有创建交易需求，创建一条交易
+        if(t!=null){
+
+            /*
+
+                t对象在controller里面已经封装好的信息如下：
+                    id,money,name,expectedDate,stage,activityId,createBy,createTime
+
+                接下来可以通过第一步生成的c对象，取出一些信息，继续完善对t对象的封装
+
+             */
+
+            t.setSource(c.getSource());
+            t.setOwner(c.getOwner());
+            t.setNextContactTime(c.getNextContactTime());
+            t.setDescription(c.getDescription());
+            t.setCustomerId(cus.getId());
+            t.setContactSummary(c.getContactSummary());
+            t.setContactsId(con.getId());
+            //添加交易
+            int count6 = tranDao.save(t);
+            if(count6!=1){
+                flag = false;
+            }
+
+            //(7)如果创建了交易，则创建一条该交易下的交易历史
+            TranHistory th = new TranHistory();
+            th.setId(UUIDUtil.getUUID());
+            th.setCreateBy(createBy);
+            th.setCreateTime(createTime);
+            th.setExpectedDate(t.getExpectedDate());
+            th.setMoney(t.getMoney());
+            th.setStage(t.getStage());
+            th.setTranId(t.getId());
+            //添加交易历史
+            int count7 = tranHistoryDao.save(th);
+            if(count7!=1){
+                flag = false;
+            }
+
+
+        }
+
+
+        //(8)删除线索备注
+        for(ClueRemark clueRemark : clueRemarkList){
+
+            int count8 = clueRemarkDao.delete(clueRemark);
+            if(count8!=1){
+                flag = false;
+            }
+        }
+
+        //(9) 删除线索和市场活动的关系
+        for(ClueActivityRelation clueActivityRelation : clueActivityRelationList){
+
+            int count9 = clueActivityRelationDao.delete(clueActivityRelation);
+            if(count9!=1){
+
+                flag = false;
+
+            }
+
+        }
+
+        //(10) 删除线索
+        int count10 = clueDao.delete(clueId);
+        if(count10!=1){
+            flag = false;
+        }
+
+
+
         return flag;
     }
 }

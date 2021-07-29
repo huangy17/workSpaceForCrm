@@ -115,7 +115,7 @@
 				}else{
 					//alert("不需要创建交易")
 					//在不需要创建交易的时候，传一个clueId就可以了
-					window.location.href= "workbench/clue/convert.do？clueId=${param.id}";
+					window.location.href= "workbench/clue/convert.do?clueId=${param.id}";
 				}
 
 
