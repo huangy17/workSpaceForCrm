@@ -1,6 +1,14 @@
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Set" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
+
+	Map<String,String> pMap = (Map<String, String>) application.getAttribute("pMap");
+
+	Set<String>  set = pMap.keySet();
+
 %>
 <!DOCTYPE html>
 <html>
@@ -15,11 +23,154 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script type="text/javascript" src="jquery/bs_typeahead/bootstrap3-typeahead.min.js"></script>
+
+	<script>
+		var json = {
+
+			<%
+				for(String key:set){
+					String value = pMap.get(key);
+			%>
+
+			"<%=key%>" : <%=value%>,
+
+			<%
+				}
+			%>
+		};
+		//alert(json);
+
+		/*
+
+			关于阶段和可能性
+				是一种一一对应的关系
+				一个阶段对应一个可能性
+				我们现在可以将阶段和可能性想象成是一种键值对之间的对应关系
+				以阶段为key，通过选中的阶段，触发可能性value
+
+				stage               possibility
+				key					value
+				01资质审查			10
+				02需求分析			25
+				03价值建议			40
+				...
+				...
+				07成交				100
+				08..				0
+				09..				0
+
+				对于以上的数据，通过观察得到结论
+				（1）数据量不是很大
+				（2）这是一种键值对的对应关系
+
+				如果同时满足以上两种结论，那么我们将这样的数据保存到数据库表中就没有什么意义了
+				如果遇到这种情况，我们需要用到properties属性文件来进行保存
+				stage2Possibility.properties
+				01资质审查=10
+				02需求分析=20
+				....
+
+
+				stage2Possibility.properties这个文件表示的是阶段和键值对之间的对应关系
+				将来，我们通过stage，以及对应关系，来取得可能性这个值
+				这种需求在交易模块中需要大量的使用到
+
+				所以我们就需要将该文件解析在服务器缓存中
+				application.setAttribute(stage2Possibility.properties文件内容)
+
+
+		 */
+
+		$(function (){
+			$("#create-customerName").typeahead({
+				source: function (query, process) {
+					//alert("!!!")
+					$.get(
+							"workbench/transaction/getCustomerName.do",
+							{ "name" : query },
+							function (data) {
+								//alert(data);
+								process(data);
+							},
+							"json"
+					);
+				},
+				delay: 1500
+			});
+
+			$(".time1").datetimepicker({
+				minView: "month",
+				language:  'zh-CN',
+				format: 'yyyy-mm-dd',
+				autoclose: true,
+				todayBtn: true,
+				pickerPosition: "bottom-left"
+			});
+			$(".time2").datetimepicker({
+				minView: "month",
+				language:  'zh-CN',
+				format: 'yyyy-mm-dd',
+				autoclose: true,
+				todayBtn: true,
+				pickerPosition: "top-left"
+			});
+
+			//为阶段的下拉框，绑定选中下拉框的时间，根据选中的阶段填写可能性
+			$("#create-stage").change(function () {
+				//取得选中的阶段
+				var stage = this.value;
+
+				/*
+				* 目标填写可能性
+				* 阶段有了：stage
+				* 阶段和可能性之间的对应关系：pMap，但是pMap是java语言中的键值对关系（java中的map对象）
+				* 首先得将pMap转换为js中的键值对关系json
+				*
+				* 我们要做的是将pMap
+				* 	pMap.put("01资质审查"，10)；
+				* 	pMap.put("02需求分析"，25)；
+				* 	...
+				* 	转换为
+				* 	var json = {"01资质审查"：10， “02需求分析”：25 ...}
+				*
+				* 以上我们已经将json处理好了
+				*
+				* 接下来取可能性
+				* */
+
+				// var possibility = json.stage;
+				//alert(stage);
+
+				/*
+
+					我们现在以json.key的形式不能取得value
+					因为今天的stage是一个可变的变量
+					如果是这样的key，那么我们就不能以传统的json.key的形式来取值(以数字开头的key也不行)
+					我们要使用的取值方式为
+					json[key]
+
+
+				 */
+				var possibility = json[stage];
+				alert(possibility);
+
+				//为可能性的文本框赋值
+				$("#create-possibility").val(possibility);
+
+
+			})
+
+
+		})
+
+	</script>
+
 
 </head>
 <body>
 
-	<!-- 查找市场活动 -->	
+	<!-- 查找市场活动 -->
 	<div class="modal fade" id="findMarketActivity" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 80%;">
 			<div class="modal-content">
@@ -70,7 +221,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		</div>
 	</div>
 
-	<!-- 查找联系人 -->	
+	<!-- 查找联系人 -->
 	<div class="modal fade" id="findContacts" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 80%;">
 			<div class="modal-content">
@@ -117,8 +268,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			</div>
 		</div>
 	</div>
-	
-	
+
+
 	<div style="position:  relative; left: 30px;">
 		<h3>创建交易</h3>
 	  	<div style="position: relative; top: -40px; left: 70%;">
@@ -132,9 +283,10 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			<label for="create-transactionOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<select class="form-control" id="create-transactionOwner">
-				  <option>zhangsan</option>
-				  <option>lisi</option>
-				  <option>wangwu</option>
+				  <option></option>
+					<c:forEach items="${uList}" var="u">
+						<option value="${u.id}" ${user.id eq u.id ? "selected" : ""}>${u.name}</option>
+					</c:forEach>
 				</select>
 			</div>
 			<label for="create-amountOfMoney" class="col-sm-2 control-label">金额</label>
@@ -142,7 +294,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				<input type="text" class="form-control" id="create-amountOfMoney">
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-transactionName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
@@ -150,39 +302,35 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			</div>
 			<label for="create-expectedClosingDate" class="col-sm-2 control-label">预计成交日期<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-expectedClosingDate">
+				<input type="text" class="form-control time1" id="create-expectedClosingDate">
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-accountName" class="col-sm-2 control-label">客户名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-accountName" placeholder="支持自动补全，输入客户不存在则新建">
+				<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
 			</div>
 			<label for="create-transactionStage" class="col-sm-2 control-label">阶段<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-			  <select class="form-control" id="create-transactionStage">
+			  <select class="form-control" id="create-stage">
 			  	<option></option>
-			  	<option>资质审查</option>
-			  	<option>需求分析</option>
-			  	<option>价值建议</option>
-			  	<option>确定决策者</option>
-			  	<option>提案/报价</option>
-			  	<option>谈判/复审</option>
-			  	<option>成交</option>
-			  	<option>丢失的线索</option>
-			  	<option>因竞争丢失关闭</option>
+				<c:forEach items="${stageList}" var="s">
+					<option value="${s.value}">${s.text}</option>
+				</c:forEach>
+
 			  </select>
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-transactionType" class="col-sm-2 control-label">类型</label>
 			<div class="col-sm-10" style="width: 300px;">
 				<select class="form-control" id="create-transactionType">
 				  <option></option>
-				  <option>已有业务</option>
-				  <option>新业务</option>
+					<c:forEach items="${transactionTypeList}" var="t">
+						<option value="${t.value}">${t.text}</option>
+					</c:forEach>
 				</select>
 			</div>
 			<label for="create-possibility" class="col-sm-2 control-label">可能性</label>
@@ -190,62 +338,53 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				<input type="text" class="form-control" id="create-possibility">
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-clueSource" class="col-sm-2 control-label">来源</label>
 			<div class="col-sm-10" style="width: 300px;">
 				<select class="form-control" id="create-clueSource">
 				  <option></option>
-				  <option>广告</option>
-				  <option>推销电话</option>
-				  <option>员工介绍</option>
-				  <option>外部介绍</option>
-				  <option>在线商场</option>
-				  <option>合作伙伴</option>
-				  <option>公开媒介</option>
-				  <option>销售邮件</option>
-				  <option>合作伙伴研讨会</option>
-				  <option>内部研讨会</option>
-				  <option>交易会</option>
-				  <option>web下载</option>
-				  <option>web调研</option>
-				  <option>聊天</option>
+					<c:forEach items="${sourceList}" var="s">
+						<option value="${s.value}">${s.text}</option>
+					</c:forEach>
 				</select>
 			</div>
 			<label for="create-activitySrc" class="col-sm-2 control-label">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" data-toggle="modal" data-target="#findMarketActivity"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-activitySrc">
+				<input type="text" class="form-control" id="create-activitySrc" value="发传单1">
+				<input type="hidden" value="f15a94f07f364d74ae6723ce8930606b"/>
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-contactsName" class="col-sm-2 control-label">联系人名称&nbsp;&nbsp;<a href="javascript:void(0);" data-toggle="modal" data-target="#findContacts"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-contactsName">
+				<input type="text" class="form-control" id="create-contactsName" value="马云">
+				<input type="hidden" value="56fb9a7d11b442a9bc7262adcd8bd0ba">
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-describe" class="col-sm-2 control-label">描述</label>
 			<div class="col-sm-10" style="width: 70%;">
 				<textarea class="form-control" rows="3" id="create-describe"></textarea>
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-contactSummary" class="col-sm-2 control-label">联系纪要</label>
 			<div class="col-sm-10" style="width: 70%;">
 				<textarea class="form-control" rows="3" id="create-contactSummary"></textarea>
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-nextContactTime">
+				<input type="text" class="form-control time2" id="create-nextContactTime">
 			</div>
 		</div>
-		
+
 	</form>
 </body>
 </html>

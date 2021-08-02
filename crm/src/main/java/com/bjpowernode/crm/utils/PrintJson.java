@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PrintJson {
-	
+	//这个工具类可以使用spring中的@@ResponseBody代替
 	//将boolean值解析为json串
 	public static void printJsonFlag(HttpServletResponse response,boolean flag){
 		
