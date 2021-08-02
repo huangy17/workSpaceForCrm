@@ -1,8 +1,18 @@
 package com.bjpowernode.crm.workbench.service;
 
+import com.bjpowernode.crm.workbench.domain.Tran;
+import com.bjpowernode.crm.workbench.domain.TranHistory;
+
+import java.util.List;
+
 /**
  * @author huangyb
  * @create 2021-07-30 22:55
  */
 public interface TranService {
+    boolean save(Tran t, String customerName);
+
+    Tran detail(String id);
+
+    List<TranHistory> getHistoryListByTranId(String tranId);
 }
