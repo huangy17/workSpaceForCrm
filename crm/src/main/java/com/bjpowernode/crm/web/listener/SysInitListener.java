@@ -14,6 +14,8 @@ import java.util.*;
  * @author huangyb
  * @create 2021-07-20 21:58
  */
+
+//spring中可以使用自定义监听器：https://blog.csdn.net/Simplg/article/details/108428891
 public class SysInitListener implements ServletContextListener {
 
     /*
