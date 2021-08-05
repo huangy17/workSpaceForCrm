@@ -12,7 +12,9 @@ import com.bjpowernode.crm.workbench.domain.TranHistory;
 import com.bjpowernode.crm.workbench.service.TranService;
 import org.apache.ibatis.session.SqlSession;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author huangyb
@@ -121,5 +123,22 @@ public class TranServiceImpl implements TranService {
         }
 
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getCharts() {
+        //取得total
+        int total = tranDao.getTotal();
+
+        //取得dataList
+        List<Map<String,Object>> dataList = tranDao.getCharts();
+
+        //将total和dataList保存到map中
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("total", total);
+        map.put("dataList", dataList);
+
+        //返回map
+        return map;
     }
 }

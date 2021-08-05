@@ -4,6 +4,7 @@ import com.bjpowernode.crm.workbench.domain.Tran;
 import com.bjpowernode.crm.workbench.domain.TranHistory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author huangyb
@@ -17,4 +18,6 @@ public interface TranService {
     List<TranHistory> getHistoryListByTranId(String tranId);
 
     boolean changeStage(Tran t);
+
+    Map<String, Object> getCharts();
 }
